@@ -1,0 +1,140 @@
+#include<bits/stdc++.h>
+using namespace std;
+ 
+// --------------- Template -----------
+ 
+//Speed
+// #define Need ios_base::sync_with_studio(false);
+#define Fast cin.tie(NULL);
+#define Speed cout.tie(NULL);
+ 
+//Aliases
+using ll = long long;
+using lld = long double;
+using ull = unsigned long long;
+ 
+//Constants
+const lld pi = 3.141592653589793238;
+const ll INF = 1e17 + 7;
+const ll mod = 1e9 + 7;
+// ll mod = 1e14 + 7;
+//TypeDEF
+typedef pair<ll, ll> pll;
+typedef pair<int , int > pii;
+typedef vector<ll> vll;
+typedef vector<pll> vpll;
+typedef vector<string> vs;
+typedef unordered_map<ll, ll> umll;
+typedef map<ll, ll> mll;
+ 
+//Macros
+#define ff first
+#define ss second
+#define pb push_back
+#define mp make_pair
+// #define fl(i,n) for(int i=0; i<n; i++)
+ 
+ 
+// ll lcm(int a, int b) {
+// 	ll a0 = a;
+// 	ll b0 = b;
+// 	return a * b / __gcd(a, b);
+// }
+ 
+// ---------------- Solve ---------------
+ 
+int mpp[1000000];
+ 
+void h(int u, int lev, vector<int> adj[]){
+	mpp[u] = lev;
+ 
+	for(int v : adj[u]){
+		h(v, lev+1, adj);
+	}
+}
+ 
+void dfs(int u, int par, vector<int> adj[], vector<vector<int>> &dp){
+	dp[0][u] = par;
+ 
+	// cout << u << endl;
+ 
+	for(int i=1; i<20; i++){
+		if(dp[i-1][u] != -1){
+			dp[i][u] = dp[i-1][dp[i-1][u]];
+		}
+	}
+ 
+	for(int v: adj[u]){
+		dfs(v, u, adj, dp);
+	}
+}
+ 
+int ans(int node, int k, vector<vector<int>> &dp){
+	if(node == -1 || k == 0)return node;
+ 
+	for(int i=19; i>=0; i--){
+		if(k >= (1 << i)){
+			return ans(dp[i][node], k -(1 << i), dp);
+		}
+	}
+ 
+	return -1;
+}
+ 
+int lca(int u, int v, vector<vector<int>> &dp){
+	if(mpp[u] < mpp[v]){
+		swap(u,v);
+	}
+ 
+	u = ans(u, mpp[u] - mpp[v], dp);
+	if(u == v)return u;
+ 
+	for(int i=19; i>=0 ; i--){
+		if(dp[i][u] != dp[i][v]){
+			u = dp[i][u];
+			v = dp[i][v];
+		}
+	}
+ 
+	return ans(u, 1, dp);
+}
+ 
+void solve() {
+	int n,q;
+	cin>> n >> q;
+ 
+	vector<int> adj[n+1];
+ 
+	for(int i=2; i<=n; i++){
+		int x;
+		cin >> x;
+ 
+		adj[x].pb(i);
+	}
+ 
+	
+	h(1,0, adj);
+ 
+	vector<vector<int>> dp(20, vector<int>(n+1, -1));
+ 
+	dfs(1, -1, adj, dp);
+ 
+	for(int i=0; i<q; i++){
+		int u, v;
+		cin >> u >> v;
+ 
+		int res = lca(u,v, dp);
+ 
+		cout << res << endl;
+	}
+}
+ 
+int main() {
+	Fast Speed
+	// int t;
+	// cin >> t;
+ 
+	// while (t-- > 0) {
+	solve();
+	// }
+}
